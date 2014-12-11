@@ -80,5 +80,70 @@ namespace Code_Profiler.Properties {
                 return ResourceManager.GetString("cpp_driver", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to #include &lt;bits/stdc++.h&gt;
+        ///#include &lt;random&gt;
+        ///#include &lt;fstream&gt;
+        ///
+        ///using namespace std;
+        ///typedef vector&lt;int&gt; vi;
+        ///typedef long long ll;
+        ///typedef unsigned long long ull;
+        ///const long long INFl = (ll)1 &lt;&lt; 62;
+        ///const int INF = 1 &lt;&lt; 30;
+        ///
+        ///int argl;
+        ///char **arg;
+        ///int getParam(const char *s){
+        ///	for (int i = 1; i&lt;argl; i += 2){
+        ///		if (!strcmp(s, arg[i]))
+        ///			return atoi(arg[i + 1]);
+        ///	}
+        ///	cout &lt;&lt; s &lt;&lt; &quot; not found\n&quot;;
+        ///}
+        ///string RandomString(int len, string c){
+        ///
+        ///	string r = &quot;&quot;;
+        ///	while (len--){
+        ///		r += c[rand() % [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string cpp_test {
+            get {
+                return ResourceManager.GetString("cpp_test", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to TESTS=10
+        ///def printArg(tc):
+        ///    print &quot;\n&quot;
+        ///print TESTS
+        ///for i in range(0, TESTS):printArg(i).
+        /// </summary>
+        internal static string py_driver {
+            get {
+                return ResourceManager.GetString("py_driver", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 10
+        ///
+        ///
+        ///
+        ///
+        ///
+        ///
+        ///
+        ///
+        ///
+        ///.
+        /// </summary>
+        internal static string text_driver {
+            get {
+                return ResourceManager.GetString("text_driver", resourceCulture);
+            }
+        }
     }
 }

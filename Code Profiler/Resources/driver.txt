@@ -1,0 +1,5 @@
+﻿TESTS=10
+def printArg(tc):
+    print "\n"
+print TESTS
+for i in range(0, TESTS):printArg(i)

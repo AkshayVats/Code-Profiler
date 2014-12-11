@@ -7,6 +7,7 @@
 &lt;ArrayOfString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
   &lt;string&gt;TEXT&lt;/string&gt;
   &lt;string&gt;VC++&lt;/string&gt;
+  &lt;string&gt;Python&lt;/string&gt;
 &lt;/ArrayOfString&gt;</Value>
     </Setting>
     <Setting Name="src1" Type="System.String" Scope="User">
@@ -32,6 +33,18 @@
     </Setting>
     <Setting Name="typ4" Type="System.String" Scope="User">
       <Value Profile="(Default)">TEXT</Value>
+    </Setting>
+    <Setting Name="VC_location" Type="System.String" Scope="User">
+      <Value Profile="(Default)">%ProgramFiles(x86)%\Microsoft Visual Studio 12.0\VC</Value>
+    </Setting>
+    <Setting Name="Python_location" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:\Python27\python.exe</Value>
+    </Setting>
+    <Setting Name="VC_enable" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="Python_enable" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
     </Setting>
   </Settings>
 </SettingsFile>

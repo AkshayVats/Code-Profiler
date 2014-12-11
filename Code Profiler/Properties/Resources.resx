@@ -121,4 +121,13 @@
   <data name="cpp_driver" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\cpp_driver.cpp;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
+  <data name="cpp_test" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\cpp_test.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="py_driver" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\driver.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="text_driver" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\text_driver.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
 </root>

@@ -1,0 +1,42 @@
+#include <bits/stdc++.h>
+#include <random>
+#include <fstream>
+
+using namespace std;
+typedef vector<int> vi;
+typedef long long ll;
+typedef unsigned long long ull;
+const long long INFl = (ll)1 << 62;
+const int INF = 1 << 30;
+
+int argl;
+char **arg;
+int getParam(const char *s){
+	for (int i = 1; i<argl; i += 2){
+		if (!strcmp(s, arg[i]))
+			return atoi(arg[i + 1]);
+	}
+	cout << s << " not found\n";
+}
+string RandomString(int len, string c){
+
+	string r = "";
+	while (len--){
+		r += c[rand() % c.size()];
+	}
+	return r;
+}
+//--------------------------//
+int main(int a, char **s){
+	srand(time(NULL)); //Randomize time
+	//---for globalization purpose
+	argl = a;
+	arg = s;
+	//----------------------------
+	std::default_random_engine gen; //use this as random engine
+	gen.seed(time(0));
+	srand(time(0));
+	//--------------------START HERE-------------------------------//
+	
+	return 0;
+}

@@ -27,7 +27,8 @@ namespace Code_Profiler.Properties {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
             "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
-            "tring>TEXT</string>\r\n  <string>VC++</string>\r\n</ArrayOfString>")]
+            "tring>TEXT</string>\r\n  <string>VC++</string>\r\n  <string>Python</string>\r\n</Array" +
+            "OfString>")]
         public global::System.Collections.Specialized.StringCollection Languages {
             get {
                 return ((global::System.Collections.Specialized.StringCollection)(this["Languages"]));
@@ -130,6 +131,54 @@ namespace Code_Profiler.Properties {
             }
             set {
                 this["typ4"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("%ProgramFiles(x86)%\\Microsoft Visual Studio 12.0\\VC")]
+        public string VC_location {
+            get {
+                return ((string)(this["VC_location"]));
+            }
+            set {
+                this["VC_location"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Python27\\python.exe")]
+        public string Python_location {
+            get {
+                return ((string)(this["Python_location"]));
+            }
+            set {
+                this["Python_location"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool VC_enable {
+            get {
+                return ((bool)(this["VC_enable"]));
+            }
+            set {
+                this["VC_enable"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool Python_enable {
+            get {
+                return ((bool)(this["Python_enable"]));
+            }
+            set {
+                this["Python_enable"] = value;
             }
         }
     }

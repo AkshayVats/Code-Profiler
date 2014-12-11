@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<Syntax name="TEXT">
+
+  <!-- Advanced rules use a regular expression to find what they must highlight -->
+  <!-- Do not overuse them, as they have a great computer time cost -->
+  <AdvancedHighlightRule name="Numbers">
+    <Expression>\b([0-9]+)\b</Expression>
+    <IgnoreCase>false</IgnoreCase>
+    <Foreground>#F68A1B</Foreground>
+    <FontWeight>Normal</FontWeight>
+    <FontStyle>Normal</FontStyle>
+  </AdvancedHighlightRule>
+  <AdvancedHighlightRule name="string">
+    <Expression>"[^"]*"</Expression>
+    <IgnoreCase>false</IgnoreCase>
+    <Foreground>#ffb672</Foreground>
+    <FontWeight>Normal</FontWeight>
+    <FontStyle>Normal</FontStyle>
+  </AdvancedHighlightRule>
+</Syntax>

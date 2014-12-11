@@ -14,7 +14,8 @@ namespace Code_Profiler.Compilers
         {
             StringBuilder sb = new StringBuilder();
             Process p = new Process();
-            p.StartInfo.FileName = location_to_use+".py";
+            p.StartInfo.FileName = DEFAULT_LOCATION;
+            p.StartInfo.Arguments = location_to_use + ".py";
             p.StartInfo.UseShellExecute = false;
             p.StartInfo.CreateNoWindow = true;
             p.StartInfo.RedirectStandardInput = p.StartInfo.RedirectStandardOutput = true;
@@ -26,9 +27,9 @@ namespace Code_Profiler.Compilers
 
         }
 
-        public string DEFAULT_LOCATION
+        public static string DEFAULT_LOCATION
         {
-            get { return ""; }
+            get {  return Environment.ExpandEnvironmentVariables(Properties.Settings.Default.Python_location); }
         }
 
         
@@ -41,6 +42,36 @@ namespace Code_Profiler.Compilers
                 f.Write(src);
             }
             return Run(location_to_use , src, test);
+        }
+
+
+        public bool FindCompiler()
+        {
+            return System.IO.File.Exists(DEFAULT_LOCATION);
+        }
+
+
+        public bool Enabled
+        {
+            get { return Properties.Settings.Default.Python_enable; }
+        }
+
+
+        public string Name
+        {
+            get { return "Python"; }
+        }
+
+
+        public string[] FileExtensions
+        {
+            get { return new string[] { "py" }; }
+        }
+
+
+        public string HighlighterKey
+        {
+            get { return "Python"; }
         }
     }
 

@@ -88,7 +88,12 @@ namespace AurelienRibon.Ui.SyntaxHighlightBox {
 				InvalidateVisual();
 			};
 		}
-
+        public void Refresh()
+        {
+            UpdateTotalLineCount();
+            InvalidateBlocks(0);
+            InvalidateVisual();
+        }
 		protected override void OnRender(DrawingContext drawingContext) {
 			DrawBlocks();
 			base.OnRender(drawingContext);

@@ -9,10 +9,7 @@ namespace Code_Profiler.Compilers
     internal class TEXT:Code_Profiler.Compiler
     {
 
-        public string DEFAULT_LOCATION
-        {
-            get { throw new NotImplementedException(); }
-        }
+        
 
         public async Task<StringBuilder> Run(string location_to_use, StringBuilder src, StringBuilder test, string arg = "")
         {
@@ -22,6 +19,36 @@ namespace Code_Profiler.Compilers
         public async Task<StringBuilder> CompileAndRun(string location_to_use, StringBuilder src, StringBuilder test, string arg="")
         {
             return src;
+        }
+
+
+        public bool FindCompiler()
+        {
+            return true;
+        }
+
+
+        public bool Enabled
+        {
+            get { return true; }
+        }
+
+
+        public string Name
+        {
+            get { return "TEXT"; }
+        }
+
+
+        public string[] FileExtensions
+        {
+            get { return new string[] { "txt" }; }
+        }
+
+
+        public string HighlighterKey
+        {
+            get { return "TEXT"; }
         }
     }
 }

@@ -21,23 +21,56 @@ namespace Code_Profiler
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        List<Compiler> compilers = new List<Compiler>();
+        private void LoadCompilers()
         {
-            
-            InitializeComponent();
+            foreach (var t in this.GetType().Assembly.GetTypes().Where(i => i.GetInterfaces().Contains(typeof(Compiler))))
+            {
+                compilers.Add(Activator.CreateInstance(t) as Compiler);
+            }
+        }
+        private void LoadSettings()
+        {
             src1.Text = Properties.Settings.Default.src1;
-            src2.Text=Properties.Settings.Default.src2;
+            src2.Text = Properties.Settings.Default.src2;
             src3.Text = Properties.Settings.Default.src3;
             src4.Text = Properties.Settings.Default.src4;
             cb1.Text = Properties.Settings.Default.typ1;
             cb2.Text = Properties.Settings.Default.typ2;
             cb3.Text = Properties.Settings.Default.typ3;
             cb4.Text = Properties.Settings.Default.typ4;
+        }
+        void VerifySettings()
+        {
+
+            if (compilers.Any(i => i.Enabled && !i.FindCompiler()))
+            {
+                MessageBox.Show("One or more compilers are not configured\nPlease configure the compilers");
+                miSettings_Click(null, null);
+                return;
+            }
+            cb1.Items.Clear();
+            cb2.Items.Clear();
+            cb3.Items.Clear();
+            cb4.Items.Clear();
+            foreach (var t in compilers)
+                if(t.Enabled)
+                {
+                    cb1.Items.Add(t.Name);
+                    cb2.Items.Add(t.Name);
+                    cb3.Items.Add(t.Name);
+                    cb4.Items.Add(t.Name);
+                }
+            cb1.Text = cb2.Text = cb3.Text = cb4.Text = "";
+        }
+        public MainWindow()
+        {
+
+            LoadCompilers();
+            InitializeComponent();
+            VerifySettings();
+            LoadSettings();
             
-            src1.CurrentHighlighter = AurelienRibon.Ui.SyntaxHighlightBox.HighlighterManager.Instance.Highlighters["cpp"];
-            src2.CurrentHighlighter = AurelienRibon.Ui.SyntaxHighlightBox.HighlighterManager.Instance.Highlighters["cpp"];
-            src3.CurrentHighlighter = AurelienRibon.Ui.SyntaxHighlightBox.HighlighterManager.Instance.Highlighters["cpp"];
-            src4.CurrentHighlighter = AurelienRibon.Ui.SyntaxHighlightBox.HighlighterManager.Instance.Highlighters["cpp"];
         }
 
         private void OpenSource(TextBox src, ComboBox cb)
@@ -49,7 +82,8 @@ namespace Code_Profiler
                 {
                     src.Text = f.ReadToEnd();
                 }
-                cb.Text = FileHelper.Tell(ofd.FileName);
+                var compiler = compilers.FirstOrDefault(i=>i.FileExtensions.Contains(new FileInfo(ofd.FileName).Extension));
+                cb.Text = compiler == null ? "TEXT" : compiler.Name;
             }
         }
         private Compiler FindCompiler(string name)
@@ -59,6 +93,7 @@ namespace Code_Profiler
                 case "VC++":
                     return new Compilers.VC();
                 case "TEXT": return new Compilers.TEXT();
+                case "Python": return new Compilers.Python();
             }
             return null;
         }
@@ -92,10 +127,10 @@ namespace Code_Profiler
             Properties.Settings.Default.Save();
             
             var analyzer = new Analyzer.BasicAnalyzer();
-            var testFile = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\src3";
-            var src1File = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\src1";
-            var src2File = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\src2";
-            var driverFile = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\src4";
+            var testFile = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Code_Profiler\\src3";
+            var src1File = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Code_Profiler\\src1";
+            var src2File = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Code_Profiler\\src2";
+            var driverFile = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Code_Profiler\\src4";
 
             var c1 = FindCompiler(cb1.Text);
             var c2 = FindCompiler(cb2.Text);
@@ -155,7 +190,7 @@ namespace Code_Profiler
                 }
                 else ot2 = await c2.Run(src2File, a2, ot3);
                 sw2.Stop();
-                if (chk1.IsChecked != false && chk2.IsChecked != false)
+                if (chk1.IsChecked != false || chk2.IsChecked != false)
                 {
                     ResultRow rr = new ResultRow()
                     {
@@ -166,17 +201,19 @@ namespace Code_Profiler
                     };
                     rr.Refresh();
                     spResult.Children.Add(rr);
-                    //txtOut.Clear();
-                    //txtOut.AppendText("Input\n"+ot3+"Output 1\n" + ot1 + "\nOutput 2\n" + ot2+"\n\n");
-                    lStatus.Content = "Analyzing..";
-                    var result = analyzer.Compare(ot1, ot2);
-                    if (result == 0) { lStatus.Content = "AC!"; }
-                    else
+                    if (chk1.IsChecked != false && chk2.IsChecked != false)
                     {
-                        MessageBox.Show("Mismatch on line " + result); lStatus.Content = result + "";
-                        break;
+                        //txtOut.Clear();
+                        //txtOut.AppendText("Input\n"+ot3+"Output 1\n" + ot1 + "\nOutput 2\n" + ot2+"\n\n");
+                        lStatus.Content = "Analyzing..";
+                        var result = analyzer.Compare(ot1, ot2);
+                        if (result == 0) { lStatus.Content = "AC!"; }
+                        else
+                        {
+                            MessageBox.Show("Mismatch on line " + result); lStatus.Content = result + "";
+                            break;
+                        }
                     }
-
                 }
             }
             prg.Value = 0;
@@ -187,7 +224,10 @@ namespace Code_Profiler
         private void bTemplate_Click(object sender, RoutedEventArgs e)
         {
             src4.Text = "";
-            src4.AppendText(Properties.Resources.cpp_driver);
+            if (cb4.Text == "VC++")
+                src4.AppendText(Properties.Resources.cpp_driver);
+            else if (cb4.Text == "Python") src4.AppendText(Properties.Resources.py_driver);
+            else src4.AppendText(Properties.Resources.text_driver);
         }
 
         private void src1_TextChanged(object sender, TextChangedEventArgs e)
@@ -208,6 +248,47 @@ namespace Code_Profiler
         private void src4_TextChanged(object sender, TextChangedEventArgs e)
         {
             chk4.IsChecked = true;
+        }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            src1.Text = src2.Text = "";
+            chk1.IsChecked = chk2.IsChecked = false;
+        }
+
+        private void miSettings_Click(object sender, RoutedEventArgs e)
+        {
+            new Settings().ShowDialog();
+            VerifySettings();
+        }
+
+        private void cb_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var name = ((ComboBox)sender).SelectedValue as string;
+            if(name!=null&&name!="")
+            {
+                var hb = ((AurelienRibon.Ui.SyntaxHighlightBox.SyntaxHighlightBox)FindName("src" + ((ComboBox)sender).Name.Replace("cb", "")));
+                hb.CurrentHighlighter = AurelienRibon.Ui.SyntaxHighlightBox.HighlighterManager.Instance.Highlighters[FindCompiler(name).HighlighterKey];
+                hb.Refresh();
+            }
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            Properties.Settings.Default.Save();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            src3.Text = "";
+            if (cb3.Text == "VC++")
+                src3.AppendText(Properties.Resources.cpp_test);
+
+        }
+
+        private void b4_Click(object sender, RoutedEventArgs e)
+        {
+            OpenSource(src4, cb4);
         }
 
         

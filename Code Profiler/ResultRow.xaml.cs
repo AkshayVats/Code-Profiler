@@ -39,7 +39,11 @@ namespace Code_Profiler
         {
             if (s == null) return;
             SnippetViewer sv = new SnippetViewer() { Text = s.ToString() };
+            FrameworkElement c = this;
+            while (!(c is MainWindow)) c =(FrameworkElement) c.Parent;
             sv.Show();
+            sv.Owner = (Window)c;
+            
         }
         string AsTime(long ms)
         {
