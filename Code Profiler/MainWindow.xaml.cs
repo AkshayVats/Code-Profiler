@@ -21,7 +21,9 @@ namespace Code_Profiler
     /// </summary>
     public partial class MainWindow : Window
     {
-        List<Compiler> compilers = new List<Compiler>();
+        internal static List<Compiler> compilers = new List<Compiler>();
+        List<SourceTab> sources = new List<SourceTab>();
+        string Current_Environment;
         private void LoadCompilers()
         {
             foreach (var t in this.GetType().Assembly.GetTypes().Where(i => i.GetInterfaces().Contains(typeof(Compiler))))
@@ -29,17 +31,7 @@ namespace Code_Profiler
                 compilers.Add(Activator.CreateInstance(t) as Compiler);
             }
         }
-        private void LoadSettings()
-        {
-            src1.Text = Properties.Settings.Default.src1;
-            src2.Text = Properties.Settings.Default.src2;
-            src3.Text = Properties.Settings.Default.src3;
-            src4.Text = Properties.Settings.Default.src4;
-            cb1.Text = Properties.Settings.Default.typ1;
-            cb2.Text = Properties.Settings.Default.typ2;
-            cb3.Text = Properties.Settings.Default.typ3;
-            cb4.Text = Properties.Settings.Default.typ4;
-        }
+
         void VerifySettings()
         {
 
@@ -49,19 +41,82 @@ namespace Code_Profiler
                 miSettings_Click(null, null);
                 return;
             }
-            cb1.Items.Clear();
-            cb2.Items.Clear();
             cb3.Items.Clear();
             cb4.Items.Clear();
+            foreach (var s in sources) s.compiler.Items.Clear();
             foreach (var t in compilers)
-                if(t.Enabled)
+                if (t.Enabled)
                 {
-                    cb1.Items.Add(t.Name);
-                    cb2.Items.Add(t.Name);
+                    foreach (var s in sources) s.compiler.Items.Add(t.Name);
                     cb3.Items.Add(t.Name);
                     cb4.Items.Add(t.Name);
                 }
-            cb1.Text = cb2.Text = cb3.Text = cb4.Text = "";
+            //TODO:something wrong with cb.text?
+        }
+        private void SaveEnvironment(string fn)
+        {
+            
+            using (StreamWriter sw = new StreamWriter(fn))
+            {
+                sw.WriteLine("CosmicCreations.Code_Profiler.Environment");
+                sw.WriteLine(cb3.Text);
+                sw.WriteLine(src3.Text.Length + "");
+                if (src3.Text.Length != 0)
+                    sw.WriteLine(src3.Text);
+                sw.WriteLine(cb4.Text);
+                sw.WriteLine(src4.Text.Length + "");
+                if (src4.Text.Length != 0) sw.WriteLine(src4.Text);
+                sw.WriteLine(sources.Count + "");
+                foreach (var s in sources)
+                {
+                    sw.WriteLine((s.Parent as TabItem).Header);
+                    sw.WriteLine(s.compiler.Text);
+                    sw.WriteLine(s.src.Text.Length);
+                    if (s.src.Text.Length != 0)
+                        sw.WriteLine(s.src.Text);
+                }
+            }
+
+        }
+        private void RestoreEnvironment(string fn)
+        {
+            using (StreamReader sr = new StreamReader(fn))
+            {
+                if (sr.ReadLine() != "CosmicCreations.Code_Profiler.Environment")
+                {
+                    MessageBox.Show("Invalid file!");
+                    return;
+                }
+                cb3.Text = sr.ReadLine();
+                char[] c = new char[int.Parse(sr.ReadLine())];
+                if (c.Length != 0)
+                {
+                    sr.Read(c, 0, c.Length);
+                    sr.ReadLine();
+                }
+                src3.Text = new string(c);
+                cb4.Text = sr.ReadLine();
+                c = new char[int.Parse(sr.ReadLine())];
+                if (c.Length != 0)
+                {
+                    sr.Read(c, 0, c.Length);
+                    sr.ReadLine();
+                }
+                src4.Text = new string(c);
+                int si = int.Parse(sr.ReadLine());
+                while (si-- > 0)
+                {
+                    var header = sr.ReadLine();
+                    var com = sr.ReadLine();
+                    c = new char[int.Parse(sr.ReadLine())];
+                    if (c.Length != 0)
+                    {
+                        sr.Read(c, 0, c.Length);
+                        sr.ReadLine();
+                    }
+                    AddSourceTab(header, com, new string(c));
+                }
+            }
         }
         public MainWindow()
         {
@@ -69,10 +124,33 @@ namespace Code_Profiler
             LoadCompilers();
             InitializeComponent();
             VerifySettings();
-            LoadSettings();
-            
-        }
 
+
+        }
+        private TabItem AddSourceTab(string header, string compiler, string src)
+        {
+            TabItem ti = new TabItem();
+            ti.HeaderTemplate = FindResource("TabHeaderTemplate") as DataTemplate;
+            ti.Header = header;
+
+            var st = new SourceTab();
+            ti.Content = st;
+            foreach (var c in compilers)
+                st.compiler.Items.Add(c.Name);
+            sources.Add(st);
+            tc.Items.Add(ti);
+            st.compiler.Text = compiler;
+            st.src.Text = src;
+
+            return ti;
+        }
+        private void AddSourceTab()
+        {
+            int i = 1;
+            while (sources.Any(j => ((string)((TabItem)j.Parent).Header) == "Source" + i)) i++;
+            AddSourceTab("Source" + i, "TEXT", "").Focus();
+
+        }
         private void OpenSource(TextBox src, ComboBox cb)
         {
             Microsoft.Win32.OpenFileDialog ofd = new Microsoft.Win32.OpenFileDialog();
@@ -82,31 +160,15 @@ namespace Code_Profiler
                 {
                     src.Text = f.ReadToEnd();
                 }
-                var compiler = compilers.FirstOrDefault(i=>i.FileExtensions.Contains(new FileInfo(ofd.FileName).Extension));
+                var compiler = compilers.FirstOrDefault(i => i.FileExtensions.Contains(new FileInfo(ofd.FileName).Extension));
                 cb.Text = compiler == null ? "TEXT" : compiler.Name;
             }
         }
-        private Compiler FindCompiler(string name)
+        internal static Compiler FindCompiler(string name)
         {
-            switch (name)
-            {
-                case "VC++":
-                    return new Compilers.VC();
-                case "TEXT": return new Compilers.TEXT();
-                case "Python": return new Compilers.Python();
-            }
-            return null;
-        }
-        private void b1_Click(object sender, RoutedEventArgs e)
-        {
-            OpenSource(src1, cb1);
-            chk1.IsChecked = true;
-        }
-
-        private void b2_Click(object sender, RoutedEventArgs e)
-        {
-            OpenSource(src2, cb2);
-            chk2.IsChecked = true;
+            var c = compilers.FirstOrDefault(i => i.Name == name);
+            if (c == null) return compilers.FirstOrDefault(i => i.Name == "TEXT");
+            return c;
         }
 
         private void b3_Click(object sender, RoutedEventArgs e)
@@ -116,35 +178,26 @@ namespace Code_Profiler
 
         private async void bAnalyze_Click(object sender, RoutedEventArgs e)
         {
-            Properties.Settings.Default.src1 = src1.Text;
-            Properties.Settings.Default.src2 = src2.Text;
-            Properties.Settings.Default.src3 = src3.Text;
-            Properties.Settings.Default.src4 = src4.Text;
-            Properties.Settings.Default.typ1 = cb1.Text;
-            Properties.Settings.Default.typ2 = cb2.Text;
-            Properties.Settings.Default.typ3 = cb3.Text;
-            Properties.Settings.Default.typ4 = cb4.Text;
-            Properties.Settings.Default.Save();
-            
+
+
             var analyzer = new Analyzer.BasicAnalyzer();
             var testFile = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Code_Profiler\\src3";
-            var src1File = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Code_Profiler\\src1";
-            var src2File = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Code_Profiler\\src2";
             var driverFile = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Code_Profiler\\src4";
-
-            var c1 = FindCompiler(cb1.Text);
-            var c2 = FindCompiler(cb2.Text);
+            //var src1File = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Code_Profiler\\src1";
+            //var src2File = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Code_Profiler\\src2";
+            
+            //var c1 = FindCompiler(cb1.Text);
+            //var c2 = FindCompiler(cb2.Text);
             var c3 = FindCompiler(cb3.Text);
             var c4 = FindCompiler(cb4.Text);
 
-            StringBuilder ot1, ot2, ot3, ot4;
-            StringBuilder a1, a2, a3, a4;
-            System.Diagnostics.Stopwatch sw1, sw2;
-            sw1=new System.Diagnostics.Stopwatch();
-            sw2=new System.Diagnostics.Stopwatch();
+            StringBuilder ot3, ot4;
+            StringBuilder a3, a4;
+            System.Diagnostics.Stopwatch sw;
+            sw=new System.Diagnostics.Stopwatch();
 
-            a1 = new StringBuilder(src1.Text);
-            a2 = new StringBuilder(src2.Text);
+            //a1 = new StringBuilder(src1.Text);
+            //a2 = new StringBuilder(src2.Text);
             a3 = new StringBuilder(src3.Text);
             a4 = new StringBuilder(src4.Text);
 
@@ -152,73 +205,126 @@ namespace Code_Profiler
             if(chk4.IsChecked==true)
             ot4 = await c4.CompileAndRun(driverFile, a4, new StringBuilder(""));
             else ot4 = await c4.Run(driverFile, a4, new StringBuilder(""));
-
+            if (ot4.ToString() == "")
+            {
+                MessageBox.Show("Invalid driver program!");
+                lStatus.Content = "Terminated";
+                return;
+            }
             chk4.IsChecked = null;
 
             System.IO.StringReader sr = new StringReader(ot4.ToString());
             int TESTS = int.Parse(sr.ReadLine());
             while (spResult.Children.Count > 1) spResult.Children.RemoveAt(1);
             prg.Maximum = TESTS;
-            for (int i = 0; i < TESTS; i++)
+            var tg = spResult.Children[0] as Grid;
+            while (tg.Children.Count > 1) tg.Children.RemoveAt(1);
+            while (tg.ColumnDefinitions.Count > 1) tg.ColumnDefinitions.RemoveAt(1);
+            foreach (var s in sources)
             {
+                TextBlock t = new TextBlock();
+                t.Foreground = Brushes.White;
+                t.TextAlignment = TextAlignment.Center;
+                t.Text = s.Header;
+                tg.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
+                Grid.SetColumn(t, tg.Children.Count);
+                tg.Children.Add(t);
+            }
+            bool flag = true;
+            for (int i = 0; i < TESTS&&flag; i++)
+            {
+                ResultRow rr = new ResultRow();
                 prg.Value = i;
                 var cmdLine = sr.ReadLine();
                 if (chk3.IsChecked == true)
                 {
                     lStatus.Content = "Running Test Generator (" + i + ")";
 
-                    ot3 = await c1.CompileAndRun(testFile, a3, new StringBuilder(""), cmdLine);
+                    ot3 = await c3.CompileAndRun(testFile, a3, new StringBuilder(""), cmdLine);
                     chk3.IsChecked = null;
                 }
-                else ot3 = await c1.Run(testFile, a3, new StringBuilder(""), cmdLine);
-
-                sw1.Restart();
-                if (chk1.IsChecked == true)
+                else ot3 = await c3.Run(testFile, a3, new StringBuilder(""), cmdLine);
+                rr.Test = new ResultRow.Program() { display = i, snippet = ot3 };
+                
+                StringBuilder old=null;
+                foreach (var s in sources)
                 {
-                    lStatus.Content = "Running Program 1";
-                    ot1 = await c1.CompileAndRun(src1File, a1, ot3);
-                    chk1.IsChecked = null;
-                }
-                else ot1 = await c1.Run(src1File, a1, ot3);
-                sw1.Stop();
-                sw2.Restart();
-                if (chk2.IsChecked == true)
-                {
-                    lStatus.Content = "Running Program 2";
-                    ot2 = await c2.CompileAndRun(src2File, a2, ot3);
-                    chk2.IsChecked = null;
-                }
-                else ot2 = await c2.Run(src2File, a2, ot3);
-                sw2.Stop();
-                if (chk1.IsChecked != false || chk2.IsChecked != false)
-                {
-                    ResultRow rr = new ResultRow()
+                    StringBuilder a, ot;
+                    Compiler c = FindCompiler(s.compiler.Text);
+                    string location = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Code_Profiler\\"+s.Header;
+                    a = new StringBuilder(s.src.Text);
+                    sw.Restart();
+                    if (s.chk.IsChecked == true)
                     {
-                        Test = new ResultRow.Program() { display=i, snippet=ot3},
-                        Program1 = new ResultRow.Program() { display=sw1.ElapsedMilliseconds, snippet=ot1},
-                        Program2 = new ResultRow.Program() { display = sw2.ElapsedMilliseconds, snippet = ot2 },
-                        Performance = new ResultRow.Program() { display =(long)( (sw1.ElapsedMilliseconds - sw2.ElapsedMilliseconds) * 1000.0 / sw2.ElapsedMilliseconds) }
-                    };
-                    rr.Refresh();
-                    spResult.Children.Add(rr);
-                    if (chk1.IsChecked != false && chk2.IsChecked != false)
+                        lStatus.Content = "Running " + s.Header;
+                        ot = await c.CompileAndRun(location, a, ot3);
+                        s.chk.IsChecked = null;
+                    }
+                    else ot = await c.Run(location, a, ot3);
+                    sw.Stop();
+                    rr.AddProgram(new ResultRow.Program() { display = sw.ElapsedMilliseconds, snippet = ot });
+                    if (old != null)
                     {
-                        //txtOut.Clear();
-                        //txtOut.AppendText("Input\n"+ot3+"Output 1\n" + ot1 + "\nOutput 2\n" + ot2+"\n\n");
-                        lStatus.Content = "Analyzing..";
-                        var result = analyzer.Compare(ot1, ot2);
+                        var result = analyzer.Compare(old, ot);
                         if (result == 0) { lStatus.Content = "AC!"; }
                         else
                         {
                             MessageBox.Show("Mismatch on line " + result); lStatus.Content = result + "";
+                            flag = false;
                             break;
                         }
                     }
+                    old = ot;
                 }
+                spResult.Children.Add(rr);
             }
             prg.Value = 0;
-            
-            
+                //if (chk1.IsChecked == true)
+            //    {
+            //        lStatus.Content = "Running Program 1";
+            //        ot1 = await c1.CompileAndRun(src1File, a1, ot3);
+            //        chk1.IsChecked = null;
+            //    }
+            //    else ot1 = await c1.Run(src1File, a1, ot3);
+            //    sw1.Stop();
+            //    sw2.Restart();
+            //    if (chk2.IsChecked == true)
+            //    {
+            //        lStatus.Content = "Running Program 2";
+            //        ot2 = await c2.CompileAndRun(src2File, a2, ot3);
+            //        chk2.IsChecked = null;
+            //    }
+            //    else ot2 = await c2.Run(src2File, a2, ot3);
+            //    sw2.Stop();
+            //    if (chk1.IsChecked != false || chk2.IsChecked != false)
+            //    {
+            //        ResultRow rr = new ResultRow()
+            //        {
+            //            Test = new ResultRow.Program() { display=i, snippet=ot3},
+            //            Program1 = new ResultRow.Program() { display=sw1.ElapsedMilliseconds, snippet=ot1},
+            //            Program2 = new ResultRow.Program() { display = sw2.ElapsedMilliseconds, snippet = ot2 },
+            //            Performance = new ResultRow.Program() { display =(long)( (sw1.ElapsedMilliseconds - sw2.ElapsedMilliseconds) * 1000.0 / sw2.ElapsedMilliseconds) }
+            //        };
+            //        rr.Refresh();
+            //        spResult.Children.Add(rr);
+            //        if (chk1.IsChecked != false && chk2.IsChecked != false)
+            //        {
+            //            //txtOut.Clear();
+            //            //txtOut.AppendText("Input\n"+ot3+"Output 1\n" + ot1 + "\nOutput 2\n" + ot2+"\n\n");
+            //            lStatus.Content = "Analyzing..";
+            //            var result = analyzer.Compare(ot1, ot2);
+            //            if (result == 0) { lStatus.Content = "AC!"; }
+            //            else
+            //            {
+            //                MessageBox.Show("Mismatch on line " + result); lStatus.Content = result + "";
+            //                break;
+            //            }
+            //        }
+            //    }
+            //}
+            //prg.Value = 0;
+
+
         }
 
         private void bTemplate_Click(object sender, RoutedEventArgs e)
@@ -230,15 +336,7 @@ namespace Code_Profiler
             else src4.AppendText(Properties.Resources.text_driver);
         }
 
-        private void src1_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            chk1.IsChecked = true;
-        }
 
-        private void src2_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            chk2.IsChecked = true;
-        }
 
         private void src3_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -252,8 +350,7 @@ namespace Code_Profiler
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
-            src1.Text = src2.Text = "";
-            chk1.IsChecked = chk2.IsChecked = false;
+            foreach (var s in sources) tc.Items.Remove(s.Parent);
         }
 
         private void miSettings_Click(object sender, RoutedEventArgs e)
@@ -265,7 +362,7 @@ namespace Code_Profiler
         private void cb_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var name = ((ComboBox)sender).SelectedValue as string;
-            if(name!=null&&name!="")
+            if (name != null && name != "")
             {
                 var hb = ((AurelienRibon.Ui.SyntaxHighlightBox.SyntaxHighlightBox)FindName("src" + ((ComboBox)sender).Name.Replace("cb", "")));
                 hb.CurrentHighlighter = AurelienRibon.Ui.SyntaxHighlightBox.HighlighterManager.Instance.Highlighters[FindCompiler(name).HighlighterKey];
@@ -291,6 +388,104 @@ namespace Code_Profiler
             OpenSource(src4, cb4);
         }
 
+
+        private void Cross_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            var c = sender as Cross;
+            DependencyObject p = c;
+            while (!(p is TabItem))
+                p = System.Windows.Media.VisualTreeHelper.GetParent(p);
+            sources.Remove((p as TabItem).Content as SourceTab);
+            tc.Items.Remove(p);
+        }
+
+       
+
+        private void textBlock_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ClickCount == 2)
+            {
+                var tbk = sender as TextBlock;
+                var g = tbk.Parent as Grid;
+                var tb = g.FindName("textBox") as TextBox;
+
+                tb.Visibility = System.Windows.Visibility.Visible;
+                Dispatcher.BeginInvoke(new Action(() => { tb.Focus(); }), System.Windows.Threading.DispatcherPriority.ContextIdle);
+                string oldText = tb.Text;
+
+                if (tb.Tag == null)
+                {
+                    DependencyObject p = tbk;
+                    while (!(p is TabItem))
+                        p = System.Windows.Media.VisualTreeHelper.GetParent(p);
+                    var ti = p as TabItem;
+                    tb.KeyDown += (o, ee) =>
+                    {
+                        if (ee.Key == Key.Escape) { tb.Text = oldText; tb.Visibility = System.Windows.Visibility.Collapsed; }
+                        else if (ee.Key == Key.Enter) { oldText = tb.Text; tb.Visibility = System.Windows.Visibility.Collapsed; }
+                    };
+                    tb.LostFocus += (o, ee) => { oldText = tb.Text; tb.Visibility = System.Windows.Visibility.Collapsed; };
+                    tb.TextChanged += (o, ee) =>
+                    {
+                        ti.Header = tb.Text;
+                    };
+                }
+                tb.Tag = true;
+            }
+        }
+
+      
+
         
+
+        private void CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (Current_Environment != null && MessageBox.Show("Save Current environment?", "Save Environment", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            {
+                SaveEnvironment(Current_Environment);
+            }
+            Microsoft.Win32.OpenFileDialog ofd = new Microsoft.Win32.OpenFileDialog();
+            ofd.Filter = "Profiler Environment|*.cpe";
+            if (ofd.ShowDialog() == true)
+            {
+                RestoreEnvironment(ofd.FileName);
+                Current_Environment = ofd.FileName;
+                Title = new FileInfo(ofd.FileName).Name;
+            }
+        }
+
+        private void CommandBinding_Executed_1(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (Current_Environment != null)
+            {
+                SaveEnvironment(Current_Environment);
+                return;
+            }
+            System.Windows.Forms.SaveFileDialog sfd = new System.Windows.Forms.SaveFileDialog();
+            sfd.AddExtension = true;
+            sfd.Filter = "Profiler Environment|*.cpe";
+            if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                if (!sfd.FileName.EndsWith(".cpe"))
+                    sfd.FileName += ".cpe";
+                SaveEnvironment(sfd.FileName);
+                Current_Environment = sfd.FileName;
+                Title = new FileInfo(sfd.FileName).Name;
+            }
+        }
+
+        private void New_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            AddSourceTab();
+        }
+
+        private void NewEnv_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+
+        }
+
+
+
+
     }
 }

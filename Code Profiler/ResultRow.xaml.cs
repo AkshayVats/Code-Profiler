@@ -24,6 +24,7 @@ namespace Code_Profiler
         public ResultRow()
         {
             InitializeComponent();
+            
         }
         
         public struct Program
@@ -31,10 +32,19 @@ namespace Code_Profiler
             public long display { get; set; }
             public StringBuilder snippet { get; set; }
         }
-        public Program Test { get; set; }
-        public Program Program1 { get; set; }
-        public Program Program2 { get; set; }
-        public Program Performance { get; set; }
+        Program _Test;
+        public Program Test
+        {
+            get { return _Test; }
+            set
+            {
+                _Test = value;
+                Label t = lTc;
+                t.Content = value.display + "";
+                
+            }
+        }
+        private List<Program> Sources = new List<Program>();
         void ShowSnippet(StringBuilder s)
         {
             if (s == null) return;
@@ -50,19 +60,21 @@ namespace Code_Profiler
             if (ms < 1000) return ms + "ms";
             else return (ms / 1000.0) + "s";
         }
-        public void Refresh()
+        public void AddProgram(Program p)
         {
-            lTc.Content = Test.display;
-            lTc.MouseDown += (o, e) => { ShowSnippet(Test.snippet); };
-
-            lPrg1.Content = AsTime(Program1.display);
-            lPrg1.MouseDown += (o, e) => { ShowSnippet(Program1.snippet); };
-
-            lPrg2.Content = AsTime(Program2.display);
-            lPrg2.MouseDown += (o, e) => { ShowSnippet(Program2.snippet); };
-
-            lProg.Content = Performance.display/10.0+"%";
-            lProg.MouseDown += (o, e) => { ShowSnippet(Performance.snippet); };
+            TextBlock t = new TextBlock();
+            t.TextAlignment = TextAlignment.Center;
+            t.Text = AsTime(p.display);
+            t.MouseDown += (o, e) => { ShowSnippet(p.snippet); };
+            grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
+            Grid.SetColumn(t, grid.Children.Count);
+            grid.Children.Add(t);
         }
+
+        private void lTc_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            ShowSnippet(Test.snippet);
+        }
+        
     }
 }

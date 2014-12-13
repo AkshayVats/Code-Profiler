@@ -5,16 +5,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="489.473" Height="26">
-    <Grid Height="26" ShowGridLines="True" Background="#FFD6DBDC">
+    <Grid x:Name="grid" Height="26" ShowGridLines="True" Background="#FFD6DBDC">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="1*"/>
+            
         </Grid.ColumnDefinitions>
-        <Label x:Name="lTc" HorizontalContentAlignment="Center" Content="Test" Grid.Column="0" Margin="31,0,23,0" Foreground="#FF575252"/>
-        <Label x:Name="lPrg1" HorizontalContentAlignment="Center" Content="Program 1" Grid.Column="1" Margin="31,0,23,0" Foreground="#FF575252"/>
-        <Label x:Name="lPrg2" HorizontalContentAlignment="Center" Content="Program 2" Grid.Column="2" Margin="31,0,23,0" Foreground="#FF575252"/>
-        <Label x:Name="lProg" HorizontalContentAlignment="Center" Content="Performance Gain" Grid.Column="3" Margin="31,0,23,0" Foreground="#FF575252" />
+        <Label x:Name="lTc" HorizontalContentAlignment="Center" Content="Test" Grid.Column="0" Margin="31,0,23,0" Foreground="#FF575252" MouseDown="lTc_MouseDown"/>
     </Grid>
 </UserControl>

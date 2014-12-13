@@ -52,6 +52,8 @@ namespace Code_Profiler.Compilers
         }
         public async Task<StringBuilder> Run(string location_to_use, StringBuilder src, StringBuilder test, string arg="")
         {
+            if (!File.Exists(location_to_use + ".exe")) 
+                return new StringBuilder( "Unable to compile and run");
             StringBuilder sb = new StringBuilder();
             Process p = new Process();
             p.StartInfo.FileName = location_to_use + ".exe";
