@@ -1,0 +1,68 @@
+﻿<UserControl
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	mc:Ignorable="d"
+	x:Class="Code_Profiler.Cross"
+	x:Name="UserControl"
+	d:DesignWidth="10" d:DesignHeight="10" Width="12" Height="12">
+	<UserControl.Resources>
+		<Storyboard x:Key="OnMouseEnter1">
+			<ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="ellipse">
+				<EasingColorKeyFrame KeyTime="0:0:0.3" Value="#FFB21717"/>
+			</ColorAnimationUsingKeyFrames>
+			<ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(Shape.Stroke).(SolidColorBrush.Color)" Storyboard.TargetName="ellipse">
+				<EasingColorKeyFrame KeyTime="0:0:0.3" Value="#FFB21717"/>
+			</ColorAnimationUsingKeyFrames>
+			<ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="path">
+				<EasingColorKeyFrame KeyTime="0:0:0.1" Value="White"/>
+			</ColorAnimationUsingKeyFrames>
+		</Storyboard>
+		<Storyboard x:Key="OnMouseLeave1">
+			<ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="ellipse">
+				<EasingColorKeyFrame KeyTime="0" Value="#FFB21717"/>
+				<EasingColorKeyFrame KeyTime="0:0:0.3" Value="White"/>
+			</ColorAnimationUsingKeyFrames>
+			<ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(Shape.Stroke).(SolidColorBrush.Color)" Storyboard.TargetName="ellipse">
+				<EasingColorKeyFrame KeyTime="0" Value="#FFB21717"/>
+				<EasingColorKeyFrame KeyTime="0:0:0.3" Value="White"/>
+			</ColorAnimationUsingKeyFrames>
+			<ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="path">
+				<EasingColorKeyFrame KeyTime="0" Value="White"/>
+				<EasingColorKeyFrame KeyTime="0:0:0.1" Value="#FFB21717"/>
+			</ColorAnimationUsingKeyFrames>
+		</Storyboard>
+	</UserControl.Resources>
+	<UserControl.Triggers>
+		<EventTrigger RoutedEvent="Mouse.MouseEnter">
+			<BeginStoryboard Storyboard="{StaticResource OnMouseEnter1}"/>
+		</EventTrigger>
+		<EventTrigger RoutedEvent="Mouse.MouseLeave">
+			<BeginStoryboard x:Name="OnMouseLeave1_BeginStoryboard" Storyboard="{StaticResource OnMouseLeave1}"/>
+		</EventTrigger>
+	</UserControl.Triggers>
+
+	<Grid x:Name="LayoutRoot" Width="12" Height="12">
+		<Ellipse x:Name="ellipse" Fill="#FFF4F4F5" Width="12" RenderTransformOrigin="0.5,0.5" Grid.Column="0" Stroke="White" Height="12">
+			<Ellipse.RenderTransform>
+				<TransformGroup>
+					<ScaleTransform ScaleX="-1"/>
+					<SkewTransform/>
+					<RotateTransform/>
+					<TranslateTransform/>
+				</TransformGroup>
+			</Ellipse.RenderTransform>
+		</Ellipse>
+		<Path x:Name="path" Height="6.584" Stroke="{x:Null}" Fill="#FFB21717" Data="M1.5102245,0 L3.3657356,2.1002626 5.6009796,0.12550056 6.5839999,1.4123671 4.4873555,3.3698304 6.4584992,5.6009786 5.1716326,6.5839999 3.2496574,4.5253665 1.1790705,6.4585016 0,5.0737755 2.0613891,3.2526085 0.12549928,1.1790708 z" Margin="1.55,1.833,1.866,1.583" RenderTransformOrigin="0.500000007595428,0.500000046013535" Stretch="Fill" Width="6.584">
+			<Path.RenderTransform>
+				<TransformGroup>
+					<ScaleTransform/>
+					<SkewTransform/>
+					<RotateTransform Angle="90"/>
+					<TranslateTransform/>
+				</TransformGroup>
+			</Path.RenderTransform>
+		</Path>
+	</Grid>
+</UserControl>
