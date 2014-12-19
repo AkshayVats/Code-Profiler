@@ -23,6 +23,7 @@ namespace Code_Profiler
 		public SourceTab()
 		{
 			this.InitializeComponent();
+            
 		}
 
         private void b1_Click(object sender, RoutedEventArgs e)
@@ -47,12 +48,12 @@ namespace Code_Profiler
             if (name != null && name != "")
             {
                 var hb = src;
-                hb.CurrentHighlighter = AurelienRibon.Ui.SyntaxHighlightBox.HighlighterManager.Instance.Highlighters[MainWindow.FindCompiler(name).HighlighterKey];
-                hb.Refresh();
+                hb.SyntaxHighlighting = ICSharpCode.AvalonEdit.Highlighting.HighlightingManager.Instance.GetDefinition(MainWindow.FindCompiler(name).HighlighterKey);
+                //hb.Refresh();
             }
         }
 
-        private void src_TextChanged(object sender, TextChangedEventArgs e)
+        private void src_TextChanged(object sender, EventArgs e)
         {
             chk.IsChecked = true;
         }
@@ -66,6 +67,15 @@ namespace Code_Profiler
             {
                 ((TabItem)Parent).Header = value; 
             }
+        }
+        public string CompilerResults
+        {
+            get;
+            set;
+        }
+        private void bI_Click(object sender, RoutedEventArgs e)
+        {
+            new SnippetViewer() { Text = CompilerResults, Title="Compiler Result" }.ShowDialog();
         }
 	}
 }

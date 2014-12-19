@@ -16,9 +16,9 @@ namespace Code_Profiler.Compilers
             return src;
         }
 
-        public async Task<StringBuilder> CompileAndRun(string location_to_use, StringBuilder src, StringBuilder test, string arg="")
+        public async Task<string> Compile(string location_to_use, StringBuilder src)
         {
-            return src;
+            return "";
         }
 
 

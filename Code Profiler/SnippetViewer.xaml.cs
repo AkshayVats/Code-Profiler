@@ -27,6 +27,7 @@ namespace Code_Profiler
         public SnippetViewer()
         {
             InitializeComponent();
+            
         }
     }
 }

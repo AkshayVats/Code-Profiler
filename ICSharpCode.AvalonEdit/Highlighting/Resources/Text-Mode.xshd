@@ -1,0 +1,17 @@
+﻿<?xml version="1.0"?>
+<SyntaxDefinition name="Text" extensions=".txt" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+<Color name="String" foreground="#ffb672" exampleText="string text = &quot;Hello, World!&quot;"/>
+<Color name="Digits" foreground="#F68A1B" />
+<!-- This is the main ruleset. -->
+	<RuleSet>
+		<Span color="String">
+			<Begin>"</Begin>
+			<End>"</End>
+			<RuleSet>
+				<!-- span for escape sequences -->
+				<Span begin="\\" end="."/>
+			</RuleSet>
+		</Span>
+    <Rule color="Digits">\b0[xX][0-9a-fA-F]+|(\b\d+(\.[0-9]+)?|\.[0-9]+)([eE][+-]?[0-9]+)?</Rule>
+	</RuleSet>
+</SyntaxDefinition>

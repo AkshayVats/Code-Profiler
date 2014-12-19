@@ -40,102 +40,6 @@ namespace Code_Profiler.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string src1 {
-            get {
-                return ((string)(this["src1"]));
-            }
-            set {
-                this["src1"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string src2 {
-            get {
-                return ((string)(this["src2"]));
-            }
-            set {
-                this["src2"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string src3 {
-            get {
-                return ((string)(this["src3"]));
-            }
-            set {
-                this["src3"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("TEXT")]
-        public string typ1 {
-            get {
-                return ((string)(this["typ1"]));
-            }
-            set {
-                this["typ1"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("TEXT")]
-        public string typ2 {
-            get {
-                return ((string)(this["typ2"]));
-            }
-            set {
-                this["typ2"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("TEXT")]
-        public string typ3 {
-            get {
-                return ((string)(this["typ3"]));
-            }
-            set {
-                this["typ3"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string src4 {
-            get {
-                return ((string)(this["src4"]));
-            }
-            set {
-                this["src4"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("TEXT")]
-        public string typ4 {
-            get {
-                return ((string)(this["typ4"]));
-            }
-            set {
-                this["typ4"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("%ProgramFiles(x86)%\\Microsoft Visual Studio 12.0\\VC")]
         public string VC_location {
             get {
@@ -179,6 +83,30 @@ namespace Code_Profiler.Properties {
             }
             set {
                 this["Python_enable"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string gcc_location {
+            get {
+                return ((string)(this["gcc_location"]));
+            }
+            set {
+                this["gcc_location"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool gcc_enable {
+            get {
+                return ((bool)(this["gcc_enable"]));
+            }
+            set {
+                this["gcc_enable"] = value;
             }
         }
     }

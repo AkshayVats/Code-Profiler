@@ -15,7 +15,7 @@ namespace Code_Profiler.Compilers
             StringBuilder sb = new StringBuilder();
             Process p = new Process();
             p.StartInfo.FileName = DEFAULT_LOCATION;
-            p.StartInfo.Arguments = location_to_use + ".py";
+            p.StartInfo.Arguments = "\""+location_to_use + ".py\"";
             p.StartInfo.UseShellExecute = false;
             p.StartInfo.CreateNoWindow = true;
             p.StartInfo.RedirectStandardInput = p.StartInfo.RedirectStandardOutput = true;
@@ -32,16 +32,16 @@ namespace Code_Profiler.Compilers
             get {  return Environment.ExpandEnvironmentVariables(Properties.Settings.Default.Python_location); }
         }
 
-        
-       
 
-        public Task<StringBuilder> CompileAndRun(string location_to_use, StringBuilder src, StringBuilder test, string arg="")
+
+
+        public async Task<string > Compile(string location_to_use, StringBuilder src)
         {
             using (var f = new System.IO.StreamWriter(location_to_use + ".py"))
             {
                 f.Write(src);
             }
-            return Run(location_to_use , src, test);
+            return "";
         }
 
 

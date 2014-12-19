@@ -12,7 +12,7 @@ namespace Code_Profiler.Compilers
     {
         static Process p = null;
 
-        public void Compile(string src, string output)
+        public string Compile(string src, string output)
         {
             if (File.Exists(output)) File.Delete(output);
             if (p == null)
@@ -32,14 +32,16 @@ namespace Code_Profiler.Compilers
             
 
             
-            p.StandardInput.WriteLine("\"" + DEFAULT_LOCATION + "\\bin\\cl.exe\" " + src + " /o " + output);
+            p.StandardInput.WriteLine("\"" + DEFAULT_LOCATION + "\\bin\\cl.exe\" \"" + src + "\" /o \"" + output+"\"");
             p.StandardInput.WriteLine("echo COMPLETED!");
             //System.Threading.Thread.Sleep(1000);
             bool flag = false;
+            string r = "";
             string s ="";//= p.StandardOutput.ReadLine();
             while (true)
             {
                 s = p.StandardOutput.ReadLine();
+                r += s + "\n";
                 if (s.Contains("COMPLETED!"))
                 {
                     if (flag) break;
@@ -47,7 +49,7 @@ namespace Code_Profiler.Compilers
                 }
             }
             //if (flag) while (!File.Exists(output)) ;
-            
+            return r;
             
         }
         public async Task<StringBuilder> Run(string location_to_use, StringBuilder src, StringBuilder test, string arg="")
@@ -75,14 +77,16 @@ namespace Code_Profiler.Compilers
             get { return Environment.ExpandEnvironmentVariables( Properties.Settings.Default.VC_location); }
         }
 
-        public Task<StringBuilder> CompileAndRun(string location_to_use, StringBuilder src, StringBuilder test, string arg="")
+        public async Task<string> Compile(string location_to_use, StringBuilder src)
         {
             using (var f = new System.IO.StreamWriter(location_to_use + ".cpp"))
             {
                 f.Write(src);
             }
-            Compile(location_to_use + ".cpp", location_to_use  + ".exe");
-            return Run(location_to_use, src, test, arg);
+            string s = null;
+            await Task.Run(() => { s = Compile(location_to_use + ".cpp", location_to_use + ".exe"); });
+            return s;
+            
         }
 
 
@@ -112,7 +116,7 @@ namespace Code_Profiler.Compilers
 
         public string HighlighterKey
         {
-            get { return "cpp"; }
+            get { return "C++"; }
         }
     }
 }

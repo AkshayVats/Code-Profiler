@@ -16,11 +16,27 @@ using System.IO;
 
 namespace Code_Profiler
 {
+    public static class CustomCommands
+    {
+        public static readonly RoutedUICommand Run = new RoutedUICommand
+                (
+                        "Run",
+                        "Run",
+                        typeof(CustomCommands),
+                        new InputGestureCollection()
+                                {
+                                        new KeyGesture(Key.F5, ModifierKeys.None)
+                                }
+                );
+
+        //Define more commands here, just like the one above
+    }
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
+        
         internal static List<Compiler> compilers = new List<Compiler>();
         List<SourceTab> sources = new List<SourceTab>();
         string Current_Environment;
@@ -37,8 +53,8 @@ namespace Code_Profiler
 
             if (compilers.Any(i => i.Enabled && !i.FindCompiler()))
             {
-                MessageBox.Show("One or more compilers are not configured\nPlease configure the compilers");
-                miSettings_Click(null, null);
+                new Settings(true);
+                VerifySettings();
                 return;
             }
             cb3.Items.Clear();
@@ -151,7 +167,7 @@ namespace Code_Profiler
             AddSourceTab("Source" + i, "TEXT", "").Focus();
 
         }
-        private void OpenSource(TextBox src, ComboBox cb)
+        private void OpenSource(ICSharpCode.AvalonEdit.TextEditor src, ComboBox cb)
         {
             Microsoft.Win32.OpenFileDialog ofd = new Microsoft.Win32.OpenFileDialog();
             if (ofd.ShowDialog() == true)
@@ -202,8 +218,11 @@ namespace Code_Profiler
             a4 = new StringBuilder(src4.Text);
 
             lStatus.Content = "Compiling Driver program";
-            if(chk4.IsChecked==true)
-            ot4 = await c4.CompileAndRun(driverFile, a4, new StringBuilder(""));
+            if (chk4.IsChecked == true)
+            {
+                bI2.Tag = await c4.Compile(driverFile, a4);
+                ot4 = await c4.Run(driverFile, a4, new StringBuilder(""));
+            }
             else ot4 = await c4.Run(driverFile, a4, new StringBuilder(""));
             if (ot4.ToString() == "")
             {
@@ -214,7 +233,12 @@ namespace Code_Profiler
             chk4.IsChecked = null;
 
             System.IO.StringReader sr = new StringReader(ot4.ToString());
-            int TESTS = int.Parse(sr.ReadLine());
+            int TESTS;
+            if (!int.TryParse(sr.ReadLine(), out TESTS))
+            {
+                MessageBox.Show("Invalid driver program");
+                return;
+            }
             while (spResult.Children.Count > 1) spResult.Children.RemoveAt(1);
             prg.Maximum = TESTS;
             var tg = spResult.Children[0] as Grid;
@@ -239,8 +263,8 @@ namespace Code_Profiler
                 if (chk3.IsChecked == true)
                 {
                     lStatus.Content = "Running Test Generator (" + i + ")";
-
-                    ot3 = await c3.CompileAndRun(testFile, a3, new StringBuilder(""), cmdLine);
+                    bI1.Tag = await c3.Compile(testFile, a3);
+                    ot3 = await c3.Run(testFile, a3, new StringBuilder(""), cmdLine);
                     chk3.IsChecked = null;
                 }
                 else ot3 = await c3.Run(testFile, a3, new StringBuilder(""), cmdLine);
@@ -253,16 +277,17 @@ namespace Code_Profiler
                     Compiler c = FindCompiler(s.compiler.Text);
                     string location = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Code_Profiler\\"+s.Header;
                     a = new StringBuilder(s.src.Text);
-                    sw.Restart();
                     if (s.chk.IsChecked == true)
                     {
                         lStatus.Content = "Running " + s.Header;
-                        ot = await c.CompileAndRun(location, a, ot3);
+                        s.CompilerResults = await c.Compile(location, a);
+                        sw.Restart();
+                        ot = await c.Run(location, a, ot3);
                         s.chk.IsChecked = null;
                     }
                     else ot = await c.Run(location, a, ot3);
                     sw.Stop();
-                    rr.AddProgram(new ResultRow.Program() { display = sw.ElapsedMilliseconds, snippet = ot });
+                    rr.AddProgram(new ResultRow.Program() { display = sw.ElapsedMilliseconds, snippet = ot});
                     if (old != null)
                     {
                         var result = analyzer.Compare(old, ot);
@@ -330,20 +355,19 @@ namespace Code_Profiler
         private void bTemplate_Click(object sender, RoutedEventArgs e)
         {
             src4.Text = "";
-            if (cb4.Text == "VC++")
+            if (cb4.Text == "VC++" || cb4.Text == "GCC(G++)")
                 src4.AppendText(Properties.Resources.cpp_driver);
             else if (cb4.Text == "Python") src4.AppendText(Properties.Resources.py_driver);
             else src4.AppendText(Properties.Resources.text_driver);
         }
 
-
-
-        private void src3_TextChanged(object sender, TextChangedEventArgs e)
+        private void src3_TextChanged(object sender, EventArgs e)
         {
             chk3.IsChecked = true;
         }
 
-        private void src4_TextChanged(object sender, TextChangedEventArgs e)
+
+        private void src4_TextChanged(object sender, EventArgs e)
         {
             chk4.IsChecked = true;
         }
@@ -355,7 +379,7 @@ namespace Code_Profiler
 
         private void miSettings_Click(object sender, RoutedEventArgs e)
         {
-            new Settings().ShowDialog();
+            new Settings(false).ShowDialog();
             VerifySettings();
         }
 
@@ -364,9 +388,9 @@ namespace Code_Profiler
             var name = ((ComboBox)sender).SelectedValue as string;
             if (name != null && name != "")
             {
-                var hb = ((AurelienRibon.Ui.SyntaxHighlightBox.SyntaxHighlightBox)FindName("src" + ((ComboBox)sender).Name.Replace("cb", "")));
-                hb.CurrentHighlighter = AurelienRibon.Ui.SyntaxHighlightBox.HighlighterManager.Instance.Highlighters[FindCompiler(name).HighlighterKey];
-                hb.Refresh();
+                var hb = ((ICSharpCode.AvalonEdit.TextEditor)FindName("src" + ((ComboBox)sender).Name.Replace("cb", "")));
+                hb.SyntaxHighlighting =ICSharpCode.AvalonEdit.Highlighting.HighlightingManager.Instance.GetDefinition( FindCompiler(name).HighlighterKey);
+//                hb.Refresh();
             }
         }
 
@@ -484,7 +508,17 @@ namespace Code_Profiler
 
         }
 
+        private void bI1_Click(object sender, RoutedEventArgs e)
+        {
+            new SnippetViewer() { Text = ((sender as Button).Tag as string) }.ShowDialog();
+        }
 
+        private void Analyze_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            bAnalyze_Click(null, null);
+        }
+
+        
 
 
     }

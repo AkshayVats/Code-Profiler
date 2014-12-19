@@ -1,9 +1,13 @@
 ﻿<Window x:Class="Code_Profiler.SnippetViewer"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="SnippetViewer" Height="300" Width="300" WindowStyle="ToolWindow">
+        xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
+        Title="SnippetViewer" Height="300" Width="300" WindowStyle="ToolWindow" BorderThickness="1" BorderBrush="#FFCBC5C5">
     <Grid>
-        <TextBox x:Name="snip" TextWrapping="Wrap" Text="TextBox"/>
-
+        <avalonEdit:TextEditor
+				x:Name="snip"
+				FontFamily="Consolas" SyntaxHighlighting="Text"
+				FontSize="10pt" Background="#FF2B2828"  Foreground="White" WordWrap="True"
+			/>
     </Grid>
 </Window>

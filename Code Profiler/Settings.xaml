@@ -8,7 +8,7 @@
             <TabItem Header="VC++">
                 <Grid Background="#FFA3D4F5" Margin="0,0,0,1">
                     <Label Content="Compiler Location" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                    <TextBox x:Name="tb1" Text="{Binding Source={x:Static properties:Settings.Default}, Path=VC_location, Mode=TwoWay}" HorizontalAlignment="Left" Height="23" Margin="10,26,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="317"/>
+                    <TextBox x:Name="tb1" Text="{Binding Source={x:Static properties:Settings.Default}, Path=VC_location, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Height="23" Margin="10,26,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="317"/>
                     <Button Content="Browse" HorizontalAlignment="Left" Margin="332,25,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click"/>
                     <CheckBox x:Name="chk1" IsChecked="{ Binding Source={x:Static properties:Settings.Default}, Path=VC_enable, Mode=TwoWay}" Content="Enabled" HorizontalAlignment="Left" Margin="10,54,0,0" VerticalAlignment="Top"/>
                     <Button x:Name="b1" Content="Check" HorizontalAlignment="Left" Margin="332,49,0,0" VerticalAlignment="Top" Width="75" Click="b1_Click"/>
@@ -17,10 +17,19 @@
             <TabItem Header="Python" Margin="-2,0,-2,-2">
                 <Grid Background="#FFA3D4F5" >
                     <Label Content="Compiler Location" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                    <TextBox x:Name="tb2" Text="{Binding Source={x:Static properties:Settings.Default}, Path=Python_location, Mode=TwoWay}" HorizontalAlignment="Left" Height="23" Margin="10,26,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="317"/>
+                    <TextBox x:Name="tb2" Text="{Binding Source={x:Static properties:Settings.Default}, Path=Python_location, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Height="23" Margin="10,26,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="317"/>
                     <Button x:Name="b2" Content="Browse" HorizontalAlignment="Left" Margin="332,25,0,0" VerticalAlignment="Top" Width="75" Click="b2_Click"/>
                     <CheckBox x:Name="chk2" IsChecked="{ Binding Source={x:Static properties:Settings.Default}, Path=Python_enable, Mode=TwoWay}" Content="Enabled" HorizontalAlignment="Left" Margin="10,54,0,0" VerticalAlignment="Top"/>
                     <Button x:Name="b3" Content="Check" HorizontalAlignment="Left" Margin="332,49,0,0" VerticalAlignment="Top" Width="75" Click="b3_Click"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="GCC" Margin="-2,0,-2,-2">
+                <Grid Background="#FFA3D4F5" >
+                    <Label Content="Compiler Location" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                    <TextBox x:Name="tb3" Text="{Binding Source={x:Static properties:Settings.Default}, Path=gcc_location, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Height="23" Margin="10,26,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="317"/>
+                    <Button x:Name="b4" Content="Browse" HorizontalAlignment="Left" Margin="332,25,0,0" VerticalAlignment="Top" Width="75" Click="b4_Click"/>
+                    <CheckBox x:Name="chk3" IsChecked="{ Binding Source={x:Static properties:Settings.Default}, Path=gcc_enable, Mode=TwoWay}" Content="Enabled" HorizontalAlignment="Left" Margin="10,54,0,0" VerticalAlignment="Top"/>
+                    <Button x:Name="b5" Content="Check" HorizontalAlignment="Left" Margin="332,49,0,0" VerticalAlignment="Top" Width="75" Click="b5_Click"/>
                 </Grid>
             </TabItem>
         </TabControl>

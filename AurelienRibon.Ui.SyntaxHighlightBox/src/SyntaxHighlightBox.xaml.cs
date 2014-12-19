@@ -11,7 +11,7 @@ using System.Threading;
 
 namespace AurelienRibon.Ui.SyntaxHighlightBox {
 	public partial class SyntaxHighlightBox : TextBox {
-
+        
 		// --------------------------------------------------------------------
 		// Attributes
 		// --------------------------------------------------------------------
@@ -87,6 +87,12 @@ namespace AurelienRibon.Ui.SyntaxHighlightBox {
 				InvalidateBlocks(e.Changes.First().Offset);
 				InvalidateVisual();
 			};
+
+            //PreviewKeyUp += (s, e) =>
+            //{
+            //    if (e.Key == Key.Return)
+            //        AppendText("\t");
+            //};
 		}
         public void Refresh()
         {
